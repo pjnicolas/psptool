@@ -1,0 +1,29 @@
+{
+  "name": "psptool",
+  "version": "0.1.0",
+  "description": "Tiny personal software process tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dizzyrobin/psptool.git"
+  },
+  "keywords": [
+    "psp"
+  ],
+  "author": "dizzyrobin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dizzyrobin/psptool/issues"
+  },
+  "homepage": "https://github.com/dizzyrobin/psptool#readme",
+  "dependencies": {
+    "inquirer": "^6.2.2",
+    "inquirer-autocomplete-prompt": "^1.0.1",
+    "keypress": "^0.2.1",
+    "moment": "^2.24.0"
+  }
+}
