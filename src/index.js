@@ -10,7 +10,6 @@ const MOMENT_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 
 const OPTIONS = {
   START: 'START a task',
-  TEMPORAL: 'Start a TEMPORAL task',
   CREATE: 'CREATE a new task',
   REMOVE: 'REMOVE a existing task',
 };
@@ -33,11 +32,6 @@ const makeRequest = async () => {
         repeat = false;
         const whatTaskStart = await prompt.askWhatTask(tasks);
         startTask(whatTaskStart);
-        break;
-      case OPTIONS.TEMPORAL:
-        repeat = false;
-        const temporalTask = await prompt.askForTextInput('Type the name of the temporal task:');
-        startTask(temporalTask);
         break;
       case OPTIONS.CREATE:
         const newTask = await prompt.askForTextInput('Type the name of the new task:');
@@ -104,6 +98,7 @@ const startTask = (name) => {
           console.log(`  Start time: ${veryStart}`);
           console.log(`Working time: ${logWorkingTime}`);
           console.log(`Resting time: ${logRestingTime}`);
+          console.log(` Description: ${description}`);
 
           writeToLog(`${name};${veryStart};${logWorkingTime};${logRestingTime};${description}`);
         }).catch((err) => {
