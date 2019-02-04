@@ -6,6 +6,8 @@ const { writeToLog, readTasks, writeTasks } = require('./persist');
 
 const makeDoubleString = n => Number(n) < 10 ? '0' + n : String(n);
 
+const MOMENT_FORMAT = 'DD/MM/YYYY HH:mm:ss';
+
 const OPTIONS = {
   START: 'START a task',
   TEMPORAL: 'Start a TEMPORAL task',
@@ -34,11 +36,11 @@ const makeRequest = async () => {
         break;
       case OPTIONS.TEMPORAL:
         repeat = false;
-        const temporalTask = await prompt.askForNewTask();
+        const temporalTask = await prompt.askForTextInput('Type the name of the temporal task:');
         startTask(temporalTask);
         break;
       case OPTIONS.CREATE:
-        const newTask = await prompt.askForNewTask();
+        const newTask = await prompt.askForTextInput('Type the name of the new task:');
         tasks.push(newTask);
         writeTasks(tasks);
         break;
@@ -49,18 +51,19 @@ const makeRequest = async () => {
         break;
     }
   }
-
 };
 
 const startTask = (name) => {
   let start = moment();
-  const veryStart = start.format('DD/MM/YYYY HH:mm:ss');
+  const veryStart = start.format(MOMENT_FORMAT);
   let state = STATE.WORKING;
   let workingTime = 0;
   let restingTime = 0;
   let returnPressed = false;
   let escapePressed = false;
-  console.log(`Task started at: [${start.format('DD/MM/YYYY HH:mm:ss')}]`);
+  console.log(`Task started at: [${start.format(MOMENT_FORMAT)}]`);
+  console.log("<ENTER>  - Pause the task");
+  console.log("<ESCAPE> - Exit and save changes");
 
   // Setting up keypress
   keypress(process.stdin);
@@ -83,6 +86,7 @@ const startTask = (name) => {
     if (escapePressed) {
       escapePressed = false;
       clearInterval(interval);
+      process.stdin.pause();
 
       if (state === STATE.WORKING) {
         workingTime += moment.duration(moment().diff(start)).asMinutes();
@@ -92,16 +96,20 @@ const startTask = (name) => {
       const logRestingTime = restingTime.toFixed(2);
 
       console.log();
-      console.log('Saving data in log...');
-      console.log(`   Task name: ${name}`);
-      console.log(`  Start time: ${veryStart}`);
-      console.log(`Working time: ${logWorkingTime}`);
-      console.log(`Resting time: ${logRestingTime}`);
+      prompt.askForTextInput('Describe what you have done:')
+        .then((description) => {
+          console.log('#####################');
+          console.log('Saving data in log...');
+          console.log(`   Task name: ${name}`);
+          console.log(`  Start time: ${veryStart}`);
+          console.log(`Working time: ${logWorkingTime}`);
+          console.log(`Resting time: ${logRestingTime}`);
 
-      writeToLog(`${name};${veryStart};${logWorkingTime};${logRestingTime}`);
+          writeToLog(`${name};${veryStart};${logWorkingTime};${logRestingTime};${description}`);
+        }).catch((err) => {
+          console.error(err);
+        });
 
-      // TODO: Clean exit
-      process.exit();
       return;
     } else if (returnPressed) {
       returnPressed = false;
@@ -116,7 +124,7 @@ const startTask = (name) => {
 
       start = newStart;
       state = state === STATE.WORKING ? STATE.RESTING : STATE.WORKING;
-      process.stdout.write(` - END AT [${start.format('DD/MM/YYYY HH:mm:ss')}]\n`);
+      process.stdout.write(` - END AT [${start.format(MOMENT_FORMAT)}]\n`);
     }
     const diffTime = moment.duration(moment().diff(start));
     const diffSeconds = makeDoubleString(diffTime.get("seconds"));
@@ -124,14 +132,13 @@ const startTask = (name) => {
     const diffHours = Math.floor(diffTime.asHours());
 
     process.stdout.write('\r');
-    if (state == STATE.WORKING) {
+    if (state === STATE.WORKING) {
       process.stdout.write('Working: ');
-    } else if (state == STATE.RESTING) {
+    } else if (state === STATE.RESTING) {
       process.stdout.write('Resting: ');
     }
     process.stdout.write(`${diffHours}:${diffMinutes}:${diffSeconds}`);
-
-  }, 50);
+  }, 100);
 };
 
 makeRequest();

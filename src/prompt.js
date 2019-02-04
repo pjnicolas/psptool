@@ -3,11 +3,11 @@ const inquirerAutocompletePrompt = require('inquirer-autocomplete-prompt');
 
 inquirer.registerPrompt('autocomplete', inquirerAutocompletePrompt);
 
-const askForNewTask = async () => {
+const askForTextInput = async (msg) => {
   const answer = await inquirer.prompt([{
     type: 'input',
     name: 'name',
-    message: 'Type the name of the new task:',
+    message: msg,
   }]);
 
   return answer.name;
@@ -49,5 +49,5 @@ const askWhatTask = async (tasks) => {
 };
 
 module.exports.askMainMenu = askMainMenu;
-module.exports.askForNewTask = askForNewTask;
+module.exports.askForTextInput = askForTextInput;
 module.exports.askWhatTask = askWhatTask;
