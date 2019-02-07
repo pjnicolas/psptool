@@ -66,9 +66,9 @@ const startTask = (name) => {
       process.exit();
     }
 
-    if (key.name === 'return') {
+    if (key && key.name === 'return') {
       returnPressed = true;
-    } else if (key.name === 'escape') {
+    } else if (key && key.name === 'escape') {
       escapePressed = true;
     }
   });
